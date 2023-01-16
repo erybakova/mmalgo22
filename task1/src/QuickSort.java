@@ -2,6 +2,24 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
+class ClassComparator <T extends Comparable<T>> implements Comparator<T> {
+    int _countCmp;
+
+    ClassComparator() {
+        _countCmp = 0;
+    }
+
+    @Override
+    public int compare(T lhs, T rhs) {
+        _countCmp++;
+        return lhs.compareTo(rhs);
+    }
+
+    public int getCountCmp() {
+        return _countCmp;
+    }
+}
+
 public class QuickSort {
     public static int countCmp = 0;
 
@@ -69,17 +87,12 @@ public class QuickSort {
 
     public static void main(String[] args) {
         Integer [] a = { 10, 10, 4, 3, 2, 1, 0, -2, 125, -10 };
+        System.out.println(Arrays.toString(a));
 
-        Comparator<Integer> cmp = new Comparator<Integer>() {
-            public int compare(Integer i, Integer j) {
-                countCmp++;
-                return i.compareTo(j);
-            }
-        };
+        ClassComparator cmp = new ClassComparator();
+        QuickSort.sort(a, cmp);
 
         System.out.println(Arrays.toString(a));
-        sort(a, cmp);
-        System.out.println(Arrays.toString(a));
-        System.out.println(countCmp);
+        System.out.println(cmp.getCountCmp());
     }
 }

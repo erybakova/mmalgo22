@@ -75,6 +75,7 @@ public class QuickSortTest {
         Assertions.assertTrue(QuickSort.isSorted(a, cmp));
         System.out.println("Number of comparisons on array of size " + n + " (QuickSort.sort): " + cmp.getCountCmp());
 
+        cmp.resetCountCmp();
         initArrayOfIntegerRandom(a);
         Arrays.sort(a, cmp);
         System.out.println("Number of comparisons on array of size " + n + " (Arrays.sort): " + cmp.getCountCmp() + "\n");

@@ -18,6 +18,10 @@ class SuperComparator <T extends Comparable<T>> implements Comparator<T> {
     public long getCountCmp() {
         return _countCmp;
     }
+
+    public void resetCountCmp() {
+        _countCmp = 0;
+    }
 }
 
 public class QuickSort {

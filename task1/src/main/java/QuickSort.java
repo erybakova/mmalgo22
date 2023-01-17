@@ -2,10 +2,10 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
-class ClassComparator <T extends Comparable<T>> implements Comparator<T> {
+class SuperComparator <T extends Comparable<T>> implements Comparator<T> {
     long _countCmp;
 
-    ClassComparator() {
+    SuperComparator() {
         _countCmp = 0;
     }
 
@@ -22,7 +22,7 @@ class ClassComparator <T extends Comparable<T>> implements Comparator<T> {
 
 public class QuickSort {
     public static <T extends Comparable<T>> void sort(T[] array) {
-        _quickSortImpl(array, 0, array.length, new ClassComparator<T>());
+        _quickSortImpl(array, 0, array.length, new SuperComparator<T>());
     }
 
     public static <T> void sort(T[] a, Comparator<T> cmp) {
@@ -41,15 +41,17 @@ public class QuickSort {
     private static <T> int _partition(T[] a, int left, int right, Comparator<T> cmp) {
         T x = a[left];
         T y = a[right - 1];
-        int length = right - left;
-        T mid;
-        if (length % 2 == 0)
-            mid = a[left + (length / 2 - 1)];
-        else
-            mid = a[left + (length / 2)];
+        int len = right - left;
+        T mid = a[left + len / 2];
 
         T pivot = _medianOf3(x, y, mid, cmp);
-        int piv_ind = java.util.Arrays.asList(a).indexOf(pivot);
+        int piv_ind;
+
+        if (cmp.compare(x, pivot) == 0)
+            piv_ind = left;
+        else if (cmp.compare(mid, pivot) == 0)
+            piv_ind = left + len / 2;
+        else piv_ind = right - 1;
 
         a[piv_ind] = a[left];
         a[left] = pivot;
@@ -87,11 +89,24 @@ public class QuickSort {
         a[j] = tmp;
     }
 
+    public static <T> boolean isSorted(T[] a, Comparator<T> cmp) {
+        if (a.length <= 1)
+            return true;
+
+        int i = 1;
+        while (i < a.length) {
+            if (cmp.compare(a[i - 1], a[i]) > 0)
+                return false;
+            ++i;
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
         Integer [] a = { 10, 10, 4, 3, 2, 1, 0, -2, 125, -10 };
         System.out.println(Arrays.toString(a));
 
-        ClassComparator cmp = new ClassComparator<Integer>();
+        SuperComparator cmp = new SuperComparator<Integer>();
 
         QuickSort.sort(a, cmp);
 

@@ -39,8 +39,6 @@ class TokenNumber extends Token {
 }
 
 abstract class TokenBinaryOperation extends Token {
-    public int priority;
-
     public abstract int getPriority();
     public abstract boolean isLeftAssociative();
     public abstract double performOperation(double a, double b);
@@ -107,7 +105,7 @@ class TokenBinaryDiv extends TokenBinaryOperation {
     }
     public String getCh() { return "/"; }
     public boolean isLeftAssociative() {
-        return false;
+        return true;
     }
     public double performOperation(double a, double b) {
         return a / b;
@@ -144,53 +142,53 @@ public class Calculator {
         return input.split(" ");
     }
 
-    private void _processTokenBinaryOperation(Deque<Token> output_queue,
-                                              Deque<Token> operator_stack,
-                                              TokenBinaryOperation token_op) {
-        while (!operator_stack.isEmpty() &&
-                   !operator_stack.peekFirst().isTokenBracket()) {
-            int op1_pr = token_op.getPriority();
-            Token op2 = operator_stack.peekFirst();
-            int op2_pr = ((TokenBinaryOperation) op2).getPriority();
-            if (op1_pr < op2_pr ||
-                    ((op1_pr == op2_pr) && token_op.isLeftAssociative())) {
-                output_queue.add(op2);
-                operator_stack.pop();
+    private void _processTokenBinaryOperation(Deque<Token> outputQueue,
+                                              Deque<Token> operatorStack,
+                                              TokenBinaryOperation tokenOp) {
+        while (!operatorStack.isEmpty() &&
+                   !operatorStack.peekFirst().isTokenBracket()) {
+            int op1Pr = tokenOp.getPriority();
+            Token op2 = operatorStack.peekFirst();
+            int op2Pr = ((TokenBinaryOperation) op2).getPriority();
+            if (op1Pr < op2Pr ||
+                    ((op1Pr == op2Pr) && tokenOp.isLeftAssociative())) {
+                outputQueue.add(op2);
+                operatorStack.pop();
             } else {
                 break;
             }
         }
-        operator_stack.push(token_op);
+        operatorStack.push(tokenOp);
     }
 
-    private void _processTokenBracketClose(Deque<Token> output_queue,
-                                           Deque<Token> operator_stack) {
-        while (!operator_stack.isEmpty() &&
-                !operator_stack.peekFirst().isTokenBracket()) {
-            Token top_op = operator_stack.peekFirst();
-            output_queue.add(top_op);
-            operator_stack.pop();
+    private void _processTokenBracketClose(Deque<Token> outputQueue,
+                                           Deque<Token> operatorStack) {
+        while (!operatorStack.isEmpty() &&
+                !operatorStack.peekFirst().isTokenBracket()) {
+            Token topOp = operatorStack.peekFirst();
+            outputQueue.add(topOp);
+            operatorStack.pop();
         }
-        if (!operator_stack.isEmpty() &&
-                operator_stack.peekFirst().isTokenBracket()) {
-            operator_stack.pop();
+        if (!operatorStack.isEmpty() &&
+                operatorStack.peekFirst().isTokenBracket()) {
+            operatorStack.pop();
         } else {
             System.out.println("Incorrect input");
             wasError = true;
         }
     }
 
-    private void _processRest(Deque<Token> output_queue,
-                              Deque<Token> operator_stack) {
-        while (!operator_stack.isEmpty()) {
-            if (operator_stack.peekFirst().isTokenBracket()) {
+    private void _processRest(Deque<Token> outputQueue,
+                              Deque<Token> operatorStack) {
+        while (!operatorStack.isEmpty()) {
+            if (operatorStack.peekFirst().isTokenBracket()) {
                 System.out.println("Incorrect input");
                 wasError = true;
                 break;
             }
-            Token top_op = operator_stack.peekFirst();
-            output_queue.add(top_op);
-            operator_stack.pop();
+            Token topOp = operatorStack.peekFirst();
+            outputQueue.add(topOp);
+            operatorStack.pop();
         }
     }
 
@@ -202,74 +200,74 @@ public class Calculator {
         System.out.print('\n');
     }
     private Deque<Token> _sortingStation(String[] tokens) {
-        Deque<Token> output_queue = new ArrayDeque<Token>();
-        Deque<Token> operator_stack = new ArrayDeque<Token>();
+        Deque<Token> outputQueue = new ArrayDeque<Token>();
+        Deque<Token> operatorStack = new ArrayDeque<Token>();
 
         for (int n = 0; n < tokens.length; n++) {
-            //_printStruct(output_queue);
-            //_printStruct(operator_stack);
+            //_printStruct(outputQueue);
+            //_printStruct(operatorStack);
 
             String str = tokens[n];
             char ch = str.charAt(0);
             if (ch >= '0' && ch <= '9') {
-                Token token_num = new TokenNumber();
-                ((TokenNumber) token_num).setValue(Double.parseDouble(str));
-                output_queue.add(token_num);
+                TokenNumber tokenNum = new TokenNumber();
+                tokenNum.setValue(Double.parseDouble(str));
+                outputQueue.add(tokenNum);
             } else if (ch == '+') {
-                Token token_op = new TokenBinaryPlus();
+                Token tokenOp = new TokenBinaryPlus();
                 _processTokenBinaryOperation(
-                        output_queue, operator_stack, (TokenBinaryOperation) token_op);
+                        outputQueue, operatorStack, (TokenBinaryOperation) tokenOp);
             } else if (ch == '-') {
-                Token token_op = new TokenBinaryMinus();
+                Token tokenOp = new TokenBinaryMinus();
                 _processTokenBinaryOperation(
-                        output_queue, operator_stack, (TokenBinaryOperation) token_op);
+                        outputQueue, operatorStack, (TokenBinaryOperation) tokenOp);
             } else if (ch == '*') {
-                Token token_op = new TokenBinaryMul();
+                Token tokenOp = new TokenBinaryMul();
                 _processTokenBinaryOperation(
-                        output_queue, operator_stack, (TokenBinaryOperation) token_op);
+                        outputQueue, operatorStack, (TokenBinaryOperation) tokenOp);
             } else if (ch == '/') {
-                Token token_op = new TokenBinaryDiv();
+                Token tokenOp = new TokenBinaryDiv();
                 _processTokenBinaryOperation(
-                        output_queue, operator_stack, (TokenBinaryOperation) token_op);
+                        outputQueue, operatorStack, (TokenBinaryOperation) tokenOp);
             } else if (ch == '^') {
-                Token token_op = new TokenBinaryPow();
+                Token tokenOp = new TokenBinaryPow();
                 _processTokenBinaryOperation(
-                        output_queue, operator_stack, (TokenBinaryOperation) token_op);
+                        outputQueue, operatorStack, (TokenBinaryOperation) tokenOp);
             } else if (ch == '(') {
-                Token token_br = new TokenBracket();
-                operator_stack.push(token_br);
+                Token tokenBr = new TokenBracket();
+                operatorStack.push(tokenBr);
             } else if (ch == ')') {
-                _processTokenBracketClose(output_queue, operator_stack);
+                _processTokenBracketClose(outputQueue, operatorStack);
             }
         }
-        _processRest(output_queue, operator_stack);
+        _processRest(outputQueue, operatorStack);
 
-        return output_queue;
+        return outputQueue;
     }
 
-    private double _stackCalculator(Deque<Token> output_queue) {
-        Deque<Token> number_stack = new ArrayDeque<Token>();
+    private double _stackCalculator(Deque<Token> outputQueue) {
+        Deque<Token> numberStack = new ArrayDeque<Token>();
 
-        while (!output_queue.isEmpty()) {
-            Token head = output_queue.peek();
+        while (!outputQueue.isEmpty()) {
+            Token head = outputQueue.peek();
             if (head.isNumber())
-                number_stack.push(head);
-            else if (head.isBinaryOperation()) {
-                Token token = number_stack.pop();
+                numberStack.push(head);
+            else if (head instanceof TokenBinaryOperation binOp) {
+                Token token = numberStack.pop();
                 double b = ((TokenNumber) token).getValue();
-                token = number_stack.pop();
+                token = numberStack.pop();
                 double a = ((TokenNumber) token).getValue();
 
-                double c = ((TokenBinaryOperation) head).performOperation(a, b);
-                Token token_num = new TokenNumber();
-                ((TokenNumber) token_num).setValue(c);
-                number_stack.push(token_num);
+                double c = binOp.performOperation(a, b);
+                Token tokenNum = new TokenNumber();
+                ((TokenNumber) tokenNum).setValue(c);
+                numberStack.push(tokenNum);
             }
-            output_queue.pop();
+            outputQueue.pop();
         }
 
-        if (number_stack.size() == 1) {
-            return ((TokenNumber) number_stack.pop()).getValue();
+        if (numberStack.size() == 1) {
+            return ((TokenNumber) numberStack.pop()).getValue();
         } else {
             wasError = true;
             System.out.println("Error in expression");
@@ -279,8 +277,8 @@ public class Calculator {
 
     public double processInput(String input) {
         String[] tokens = _parseExpression(input);
-        Deque<Token> output_queue = _sortingStation(tokens);
-        return _stackCalculator(output_queue);
+        Deque<Token> outputQueue = _sortingStation(tokens);
+        return _stackCalculator(outputQueue);
     }
 
     public static void main(String[] args) {

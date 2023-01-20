@@ -28,33 +28,37 @@ public class TradesAnalyser {
         listSortedSecCodeTradesTQBR
                 .stream()
                 .limit(10)
-                .forEach(l -> System.out.println(l.getKey() + " (падение цены на " + Math.abs(l.getValue().changePrice()) + " руб., или " +
-                        Math.abs(l.getValue().changePricePercent()) + "%; общее количество акций: " + l.getValue().getTotalVolume() +
-                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
 
         System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке TQBR:");
         listSortedSecCodeTradesTQBR
                 .stream()
                 .skip(Math.max(0, listSortedSecCodeTradesTQBR.size() - 10))
-                .forEach(l -> System.out.println(l.getKey() + " (рост цены на " + l.getValue().changePrice() + " руб., или " +
-                        l.getValue().changePricePercent() + "%; общее количество акций: " + l.getValue().getTotalVolume() +
-                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
 
         System.out.println("\n10 самых неудачливых акций дня, торгуемых на площадке FQBR:");
         listSortedSecCodeTradesFQBR
                 .stream()
                 .limit(10)
-                .forEach(l -> System.out.println(l.getKey() + " (падение цены на " + Math.abs(l.getValue().changePrice()) + " руб., или " +
-                        Math.abs(l.getValue().changePricePercent()) + "%; общее количество акций: " + l.getValue().getTotalVolume() +
-                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
 
         System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке FQBR:");
         listSortedSecCodeTradesFQBR
                 .stream()
                 .skip(Math.max(0, listSortedSecCodeTradesFQBR.size() - 10))
-                .forEach(l -> System.out.println(l.getKey() + " (рост цены на " + l.getValue().changePrice() + " руб., или " +
-                        l.getValue().changePricePercent() + "%; общее количество акций: " + l.getValue().getTotalVolume() +
-                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
     }
 
     public static void main(String[] args) {

@@ -1,5 +1,4 @@
 public class Trade {
-    // 003422595396	090217	SPEQ	GAZP	214.2500000000	6000	0.00	0.00	1285500.00
     private long _tradeNo;     // номер сделки
     private long _tradeTime;   // время сделки
     private String _secBoard;  // площадка

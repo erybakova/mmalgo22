@@ -40,4 +40,11 @@ public class Sec {
     public float changePricePercent() {
         return 100 * (_closingPrice / _openingPrice - 1);
     }
+
+    public void printInfo() {
+        String st = this.changePrice() > 0 ? "рост" : "падение";
+        System.out.println(" (" + st + " цены на " + Math.abs(this.changePrice()) + " руб., или " +
+                           Math.abs(this.changePricePercent()) + "%; общее количество акций: " + this.getTotalVolume() +
+                           "; общая сумма сделок по акции: " + this.getTotalValue() + " руб.)");
+    }
 }

@@ -7,58 +7,38 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TradesAnalyser {
+    private static void _processImpl(List<Trade> trades, String secBoard) {
+        Map<String, Sec> mapSecCodeTradesSecBoard = trades.stream()
+                .filter(trade -> trade.secBoard().equals(secBoard))
+                .collect(Collectors.toMap(Trade::secCode, Sec::new, Sec::merge));
+
+        List<Map.Entry<String, Sec>> listSortedSecCodeTrades =
+                mapSecCodeTradesSecBoard.entrySet().stream()
+                .sorted((a, b) -> Float.compare(a.getValue().changePrice(), b.getValue().changePrice()))
+                .toList();
+
+        System.out.println("\n10 самых неудачливых акций дня, торгуемых на площадке " + secBoard + ":");
+        listSortedSecCodeTrades
+                .stream()
+                .limit(10)
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
+
+        System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке " + secBoard + ":");
+        listSortedSecCodeTrades
+                .stream()
+                .skip(Math.max(0, listSortedSecCodeTrades.size() - 10))
+                .forEach(l -> {
+                    System.out.print(l.getKey());
+                    l.getValue().printInfo();
+                });
+    }
+
     public static void process(List<Trade> trades) {
-        Map<String, Sec> mapSecCodeTradesTQBR = trades.stream()
-                .filter(trade -> trade.getSecBoard().equals("TQBR"))
-                .collect(Collectors.toMap(Trade::getSecCode, Sec::new, Sec::merge));
-        Map<String, Sec> mapSecCodeTradesFQBR = trades.stream()
-                .filter(trade -> trade.getSecBoard().equals("FQBR"))
-                .collect(Collectors.toMap(Trade::getSecCode, Sec::new, Sec::merge));
-
-        List<Map.Entry<String, Sec>> listSortedSecCodeTradesTQBR =
-                mapSecCodeTradesTQBR.entrySet().stream()
-                .sorted((a, b) -> Float.compare(a.getValue().changePrice(), b.getValue().changePrice()))
-                .toList();
-        List<Map.Entry<String, Sec>> listSortedSecCodeTradesFQBR =
-                mapSecCodeTradesFQBR.entrySet().stream()
-                .sorted((a, b) -> Float.compare(a.getValue().changePrice(), b.getValue().changePrice()))
-                .toList();
-
-        System.out.println("10 самых неудачливых акций дня, торгуемых на площадке TQBR:");
-        listSortedSecCodeTradesTQBR
-                .stream()
-                .limit(10)
-                .forEach(l -> {
-                    System.out.print(l.getKey());
-                    l.getValue().printInfo();
-                });
-
-        System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке TQBR:");
-        listSortedSecCodeTradesTQBR
-                .stream()
-                .skip(Math.max(0, listSortedSecCodeTradesTQBR.size() - 10))
-                .forEach(l -> {
-                    System.out.print(l.getKey());
-                    l.getValue().printInfo();
-                });
-
-        System.out.println("\n10 самых неудачливых акций дня, торгуемых на площадке FQBR:");
-        listSortedSecCodeTradesFQBR
-                .stream()
-                .limit(10)
-                .forEach(l -> {
-                    System.out.print(l.getKey());
-                    l.getValue().printInfo();
-                });
-
-        System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке FQBR:");
-        listSortedSecCodeTradesFQBR
-                .stream()
-                .skip(Math.max(0, listSortedSecCodeTradesFQBR.size() - 10))
-                .forEach(l -> {
-                    System.out.print(l.getKey());
-                    l.getValue().printInfo();
-                });
+        _processImpl(trades, "TQBR");
+        _processImpl(trades, "FQBR");
     }
 
     public static void main(String[] args) {

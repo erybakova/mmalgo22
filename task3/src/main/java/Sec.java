@@ -11,10 +11,10 @@ public class Sec {
         this._totalValue = 0;
     }
     public Sec(Trade a) {
-        this._openingPrice = a.getPrice();
-        this._closingPrice = a.getPrice();
-        this._totalVolume = a.getVolume();
-        this._totalValue = a.getValue();
+        this._openingPrice = a.price();
+        this._closingPrice = a.price();
+        this._totalVolume = a.volume();
+        this._totalValue = a.value();
     }
     public Sec merge(Sec b) {
         this._closingPrice = b._closingPrice;

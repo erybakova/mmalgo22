@@ -5,12 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TradesAnalyser {
-    // Функция, вычисляющая цену открытия и закрытия для бумаг, торгуемых на площадках TQBR и FQBR,
-    // и выводящая 10 самых удачливых и 10 самых неудачливых (с максимальным ростом и максимальным падением цены)
-    // акций дня, а также изменение цены (в %), количество и общий объем сделок (в руб.) для каждой из этих акций.
     public static void process(List<Trade> trades) {
         Map<String, Sec> mapSecCodeTradesTQBR = trades.stream()
                 .filter(trade -> trade.getSecBoard().equals("TQBR"))
@@ -18,14 +14,6 @@ public class TradesAnalyser {
         Map<String, Sec> mapSecCodeTradesFQBR = trades.stream()
                 .filter(trade -> trade.getSecBoard().equals("FQBR"))
                 .collect(Collectors.toMap(Trade::getSecCode, Sec::new, Sec::merge));
-
-        /*for (Map.Entry<String, Sec> item : mapSecCodeTradesTQBR.entrySet()) {
-            System.out.println(item.getKey());
-            System.out.println(item.getValue().getOpeningPrice());
-            System.out.println(item.getValue().getClosingPrice());
-            System.out.println(item.getValue().getTotalVolume());
-            System.out.println(item.getValue().getTotalValue());
-        }*/
 
         List<Map.Entry<String, Sec>> listSortedSecCodeTradesTQBR =
                 mapSecCodeTradesTQBR.entrySet().stream()

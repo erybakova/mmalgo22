@@ -1,0 +1,88 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class TradesAnalyser {
+    // Функция, вычисляющая цену открытия и закрытия для бумаг, торгуемых на площадках TQBR и FQBR,
+    // и выводящая 10 самых удачливых и 10 самых неудачливых (с максимальным ростом и максимальным падением цены)
+    // акций дня, а также изменение цены (в %), количество и общий объем сделок (в руб.) для каждой из этих акций.
+    public static void process(List<Trade> trades) {
+        Map<String, Sec> mapSecCodeTradesTQBR = trades.stream()
+                .filter(trade -> trade.getSecBoard().equals("TQBR"))
+                .collect(Collectors.toMap(Trade::getSecCode, Sec::new, Sec::merge));
+        Map<String, Sec> mapSecCodeTradesFQBR = trades.stream()
+                .filter(trade -> trade.getSecBoard().equals("FQBR"))
+                .collect(Collectors.toMap(Trade::getSecCode, Sec::new, Sec::merge));
+
+        /*for (Map.Entry<String, Sec> item : mapSecCodeTradesTQBR.entrySet()) {
+            System.out.println(item.getKey());
+            System.out.println(item.getValue().getOpeningPrice());
+            System.out.println(item.getValue().getClosingPrice());
+            System.out.println(item.getValue().getTotalVolume());
+            System.out.println(item.getValue().getTotalValue());
+        }*/
+
+        List<Map.Entry<String, Sec>> listSortedSecCodeTradesTQBR =
+                mapSecCodeTradesTQBR.entrySet().stream()
+                .sorted((a, b) -> Float.compare(a.getValue().changePrice(), b.getValue().changePrice()))
+                .toList();
+        List<Map.Entry<String, Sec>> listSortedSecCodeTradesFQBR =
+                mapSecCodeTradesFQBR.entrySet().stream()
+                .sorted((a, b) -> Float.compare(a.getValue().changePrice(), b.getValue().changePrice()))
+                .toList();
+
+        System.out.println("10 самых неудачливых акций дня, торгуемых на площадке TQBR:");
+        listSortedSecCodeTradesTQBR
+                .stream()
+                .limit(10)
+                .forEach(l -> System.out.println(l.getKey() + " (падение цены на " + Math.abs(l.getValue().changePrice()) + " руб., или " +
+                        Math.abs(l.getValue().changePricePercent()) + "%; общее количество акций: " + l.getValue().getTotalVolume() +
+                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+
+        System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке TQBR:");
+        listSortedSecCodeTradesTQBR
+                .stream()
+                .skip(Math.max(0, listSortedSecCodeTradesTQBR.size() - 10))
+                .forEach(l -> System.out.println(l.getKey() + " (рост цены на " + l.getValue().changePrice() + " руб., или " +
+                        l.getValue().changePricePercent() + "%; общее количество акций: " + l.getValue().getTotalVolume() +
+                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+
+        System.out.println("\n10 самых неудачливых акций дня, торгуемых на площадке FQBR:");
+        listSortedSecCodeTradesFQBR
+                .stream()
+                .limit(10)
+                .forEach(l -> System.out.println(l.getKey() + " (падение цены на " + Math.abs(l.getValue().changePrice()) + " руб., или " +
+                        Math.abs(l.getValue().changePricePercent()) + "%; общее количество акций: " + l.getValue().getTotalVolume() +
+                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+
+        System.out.println("\n10 самых удачливых акций дня, торгуемых на площадке FQBR:");
+        listSortedSecCodeTradesFQBR
+                .stream()
+                .skip(Math.max(0, listSortedSecCodeTradesFQBR.size() - 10))
+                .forEach(l -> System.out.println(l.getKey() + " (рост цены на " + l.getValue().changePrice() + " руб., или " +
+                        l.getValue().changePricePercent() + "%; общее количество акций: " + l.getValue().getTotalVolume() +
+                        "; общая сумма сделок по акции: " + l.getValue().getTotalValue() + " руб.)"));
+    }
+
+    public static void main(String[] args) {
+        List<Trade> trades = new ArrayList<Trade>();
+        try (
+                var reader = new FileReader("data/trades.txt");
+                var bufferedReader = new BufferedReader(reader)) {
+            String line = bufferedReader.readLine();
+            while ((line = bufferedReader.readLine()) != null) {
+                var parts = line.split("\t");
+                trades.add(new Trade(parts));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        process(trades);
+    }
+}

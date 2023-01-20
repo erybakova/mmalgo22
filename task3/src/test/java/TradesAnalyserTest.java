@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-public class TradesAnalyzatorTest {
+public class TradesAnalyserTest {
     @Test
     public void testTradesAnalyzator() {
-        TradesAnalyzator t = new TradesAnalyzator();
+        TradesAnalyser t = new TradesAnalyser();
 
         Assertions.assertTrue(true);
     }

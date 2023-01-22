@@ -1,97 +1,104 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Solver {
-    private class AdjacentStates implements Comparable<AdjacentStates> {
-        public State currState, prevState;
-        public int moves;
-
-        public AdjacentStates(State prev, State curr, int steps) {
-            this.prevState = prev;
-            this.currState = curr;
-            this.moves = steps;
-        }
-        @Override
-        public int compareTo(AdjacentStates rhs) {
-            int pr1 = _a * currState.getManhattan() + _b * moves;
-            int pr2 = _a * rhs.currState.getManhattan() + _b * rhs.moves;
-
-            return Integer.compare(pr1, pr2);
-        }
-    }
-    private int _a, _b;
-    private AdjacentStates _initialState;
-    private Set<AdjacentStates> _explored;
-    private PriorityQueue<AdjacentStates> _queueOfStates;
+    public static int a, b;
+    public final Board solutionMatrix;
+    private final State _initialState;
+    private State _finalState;
+    private Set<Board> _explored;
+    private PriorityQueue<State> _queueOfStates;
     public boolean _isVictory;
 
-    Solver(Board matrix) {
-        _initialState = new AdjacentStates(null, new State(matrix), 0);
-        _explored = new HashSet<AdjacentStates>();
-        _queueOfStates = new PriorityQueue<AdjacentStates>();
-        _isVictory = false;
+    Solver(Board matrix, Board solutionMatrix) {
+        this._initialState = new State(null, matrix, 0);
+        this._explored = new HashSet<Board>();
+        this._queueOfStates = new PriorityQueue<State>();
+        this._isVictory = false;
+        this.solutionMatrix = new Board(matrix.getN(), true);
+        this._finalState = null;
     }
+
     public void setPriorityParams(int a, int b) {
-        this._a = a;
-        this._b = b;
+        Solver.a = a;
+        Solver.b = b;
     }
+
     public boolean isVictory() {
         return _isVictory;
     }
-    private LinkedList<AdjacentStates> getNeighbours(AdjacentStates statesPair) {
-        LinkedList<AdjacentStates> neighbours = new LinkedList<AdjacentStates>();
 
-        int steps = statesPair.moves;
-        State prev = statesPair.prevState;
-        State cur = statesPair.currState;
-        LinkedList<State> nextStates = cur.getNextStates();
+    public Stack<Board> retracePath() {
+        if (!isVictory())
+            return null;
 
-        State next;
-        while ((next = nextStates.pollFirst()) != null)
-            if (!next.isEqual(prev))
-                neighbours.addFirst(new AdjacentStates(cur, next, steps + 1));
-
-        return neighbours;
+        Stack<Board> stackSolution = new Stack<>();
+        State current = _finalState;
+        while (current.getPrevState() != null) {
+            stackSolution.push(current.getCurrMatrix());
+            current = current.getPrevState();
+        }
+        //stackSolution.push(_initialState.getCurrMatrix());
+        return stackSolution;
     }
-    public int solve() {
-        _queueOfStates.clear();
+
+    public boolean solve() {
+        _isVictory = false;
+
         _queueOfStates.add(_initialState);
-        AdjacentStates adjacentStates = new AdjacentStates(null, null, 0);
 
-        while (true) {
-            adjacentStates = _queueOfStates.poll();
-
-            assert adjacentStates != null;
-            if (adjacentStates.currState.isVictory()) {
+        while (!_queueOfStates.isEmpty()) {
+            //System.out.println("I`m here\n");
+            State st = _queueOfStates.peek();
+            //st.getCurrMatrix().print();
+            //System.out.println();
+            if (st.getCurrMatrix().equals(solutionMatrix)) {
                 _isVictory = true;
+                _finalState = st;
                 break;
             }
 
-            _explored.add(adjacentStates);
-
-            LinkedList<AdjacentStates> neighbours = getNeighbours(adjacentStates);
+            st = _queueOfStates.poll();
+            assert st != null;
+            _explored.add(st.getCurrMatrix());
+            List<Board> neighbours = st.getNeighbourStates();
+            State finalSt = st;
             neighbours.stream()
                     .filter(e -> !_explored.contains(e))
-                    .forEach(e -> _queueOfStates.add(e));
+                    .forEach(e -> _queueOfStates.add(new State(finalSt, e, finalSt.getMoves() + 1)));
         }
 
-        return adjacentStates.moves;
+        _queueOfStates.clear();
+        _explored.clear();
+
+        return _isVictory;
     }
+
     public static void main(String[] args) {
         int n = 4;
 
-        Board matrixInit = new Board(n);
-        matrixInit.setRandom(123);
-        matrixInit.print();
+        /*Board matrixInit = new Board(n, false);
+        matrixInit.setRandom(123);*/
+        int[] m = {  1,  6,  2,  3,
+                     9,  5,  8,  7,
+                     0, 10, 12,  4,
+                    13, 14, 11, 15 };
+        Board matrixInit = new Board(m, n);
+        Board solutionMatrix = new Board(n, true);
 
-        Solver solver = new Solver(matrixInit);
+        matrixInit.print();
+        Solver solver = new Solver(matrixInit, solutionMatrix);
 
         for (int a = 1; a <= 10; ++a) {
             for (int b = 1; b <= 10; ++b) {
                 solver.setPriorityParams(a, b);
                 System.out.printf("a = " + a + ", b = " + b + ": ");
-                int moves = solver.solve();
-                System.out.printf("solved in " + moves + " moves\n");
+                boolean solved = solver.solve();
+                if (solved) {
+                    System.out.print("Solved in ");
+                    Stack<Board> pth = solver.retracePath();
+                    System.out.print(pth.size() + " steps\n");
+                } else
+                    System.out.print("Not solved\n");
             }
         }
     }

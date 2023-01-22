@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.Stack;
+
 public class SolverTest {
     @Test
     public void solverTest1() {
@@ -11,37 +13,40 @@ public class SolverTest {
                        13, 14, 11, 15 };
 
         Board matrixInit = new Board(matr, n);
-        Solver solver = new Solver(matrixInit);
+        Board solutionMatrix = new Board(n, true);
+        Solver solver = new Solver(matrixInit, solutionMatrix);
+
+        matrixInit.print();
 
         for (int a = 1; a <= 10; ++a) {
             for (int b = 1; b <= 10; ++b) {
                 solver.setPriorityParams(a, b);
                 System.out.printf("a = " + a + ", b = " + b + ": ");
-                int moves = solver.solve();
-                Assertions.assertTrue(solver.isVictory());
-                System.out.printf("solved in " + moves + " moves\n");
+                Assertions.assertTrue(solver.solve());
+                System.out.print("Solved in ");
+                Stack<Board> pth = solver.retracePath();
+                System.out.print(pth.size() + " steps\n");
             }
         }
     }
 
     @Test
     public void solverTest2() {
-        int n = 4;
-        int[] matr = {  1, 2,  4,  7,
-                        9, 5, 12,  3,
-                       13, 0, 10,  8,
-                       14, 6, 11, 15 };
+        int n = 3;
+        int[] matr = {  1, 2, 3,
+                        4, 5, 6,
+                        8, 7, 0 };
 
         Board matrixInit = new Board(matr, n);
-        Solver solver = new Solver(matrixInit);
+        Board solutionMatrix = new Board(n, true);
+        Solver solver = new Solver(matrixInit, solutionMatrix);
+
+        matrixInit.print();
 
         for (int a = 1; a <= 10; ++a) {
             for (int b = 1; b <= 10; ++b) {
                 solver.setPriorityParams(a, b);
-                System.out.printf("a = " + a + ", b = " + b + ": ");
-                int moves = solver.solve();
-                Assertions.assertTrue(solver.isVictory());
-                System.out.printf("solved in " + moves + " moves\n");
+                Assertions.assertFalse(solver.solve());
             }
         }
     }

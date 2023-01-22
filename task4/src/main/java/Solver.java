@@ -47,10 +47,8 @@ public class Solver {
         _queueOfStates.add(_initialState);
 
         while (!_queueOfStates.isEmpty()) {
-            //System.out.println("I`m here\n");
             State st = _queueOfStates.peek();
-            //st.getCurrMatrix().print();
-            //System.out.println();
+
             if (st.getCurrMatrix().equals(solutionMatrix)) {
                 _isVictory = true;
                 _finalState = st;

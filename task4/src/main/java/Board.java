@@ -54,16 +54,12 @@ public class Board {
     @Override
     public boolean equals(Object rhs) {
         return (rhs instanceof Board other) &&
-                Arrays.equals(_matrix, ((Board) rhs).getMatrix());
+                    Arrays.equals(_matrix, other._matrix);
     }
 
     @Override
     public int hashCode() {
         return Arrays.hashCode(_matrix);
-    }
-
-    public boolean equals(Board rhs) {
-        return Arrays.equals(_matrix, rhs._matrix);
     }
 
     public Board copy() {
